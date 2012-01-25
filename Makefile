@@ -5,6 +5,7 @@ BOOTSTRAP_LESS = ./lib/bootstrap.less
 LESS_COMPRESSOR ?= `which lessc`
 UGLIFY_JS ?= `which uglifyjs`
 WATCHR ?= `which watchr`
+INOTIFYWAIT ?= `which inotifywait`
 
 #
 # Build less files
@@ -23,7 +24,7 @@ build:
 	fi
 
 #
-# Watch less files
+# Watch less files with watchr
 #
 
 watch:
@@ -36,6 +37,20 @@ watch:
 	fi
 
 #
+# Watch less files with inotify
+#
+
+inotify:
+	@@if test ! -z ${INOTIFYWAIT}; then \
+		while inotifywait -e modify --timefmt '%d/%m/%y %H:%M' --format '%T %e %f' lib; do \
+			make build && echo "=="; \
+		done \
+	else \
+		echo "You must have the inotifywait installed in order to watch Bootstrap Less files."; \
+		echo "You can get inotify-tools on github (https://github.com/rvoicilas/inotify-tools/wiki/)."; \
+	fi
+
+#
 # Build docs from templates
 #
 
@@ -43,4 +58,4 @@ docs:
 	@ node docs/build
 
 
-.PHONY: build watch docs
+.PHONY: build watch inotify docs
